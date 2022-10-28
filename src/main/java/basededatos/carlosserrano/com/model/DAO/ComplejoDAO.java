@@ -1,6 +1,5 @@
 package basededatos.carlosserrano.com.model.DAO;
 
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,38 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import basededatos.carlosserrano.com.model.Conection.MariaDBConnection;
+import basededatos.carlosserrano.com.model.Entity.Complejo;
 import basededatos.carlosserrano.com.model.Entity.Sede;
 
-//SedeDAOImplMariaDB
-public class SedeDAO extends Sede{
-//Las consultas MariaDB de este DAO
-	private final static String INSERT = "INSERT INTO Sede (nombre) VALUES (?)";
-	private final static String UPDATE = "UPDATE Sede SET nombre=? WHERE id=?";
-	private final static String DELETE = "DELETE FROM Sede WHERE id=?";
-	private final static String SELECTBYID = "SELECT id,nombre FROM Sede WHERE id=?";
-	private final static String SELECTALL = "SELECT id,nombre FROM Sede";
-
+public class ComplejoDAO extends Complejo{
+	//Las consultas MariaDB de este DAO
+		private final static String INSERT = "INSERT INTO Complejo (nombre,superficie) VALUES (?,?)";
+		private final static String UPDATE = "UPDATE Complejo SET nombre=?,superficie=? WHERE id=?";
+		private final static String DELETE = "DELETE FROM Complejo WHERE id=?";
+		private final static String SELECTBYID = "SELECT id,nombre,superficie,id_sede FROM Complejo WHERE id=?";
+		private final static String SELECTALL = "SELECT id,nombre,superficie FROM Complejo";
 	
-	//Fin de las consultas
-	public SedeDAO(int id,String nombre){ super(id,nombre);}
-	public SedeDAO(){	super(); 
-		/*Field[] campos = getClass().getSuperclass().getDeclaredFields();
-		
-		String sql = "SELECT ";
-		int i=0;
-		for(Field campo : campos) {
-				if(i>0) sql+=",";
-				sql+=campo.getName();
-				i++;
-		}
-		sql+=" FROM "+getClass().getSuperclass().getSimpleName();
-		System.out.println(sql);*/
+	public ComplejoDAO(int id, String nombre, int superficie) {
+		super(id,nombre,superficie);
 	}
-	public SedeDAO(Sede sede){	super(sede.getId(),sede.getNombre());}
-	public SedeDAO(int id){
+	public ComplejoDAO() {
+		super();
+	}
+	public ComplejoDAO(Complejo d) {
+		this(d.getId(),d.getNombre(),d.getSuperficie());
+	}
+	public ComplejoDAO(int id) {
 		this.getById(id);
 	}
-
+	
 	public void save() {
 		if(id==-1) {
 			//INSERT
@@ -51,6 +42,7 @@ public class SedeDAO extends Sede{
 				try {
 					ps = conn.prepareStatement(INSERT,Statement.RETURN_GENERATED_KEYS);
 					ps.setString(1, this.nombre);
+					ps.setInt(2, this.superficie);
 					ps.executeUpdate();  //devuelve 1 si todo ok
 					ResultSet rs = ps.getGeneratedKeys();
 					if(rs.next()) {
@@ -74,7 +66,8 @@ public class SedeDAO extends Sede{
 				try {
 					ps = conn.prepareStatement(UPDATE);
 					ps.setString(1, this.nombre);
-					ps.setInt(2, this.id);
+					ps.setInt(2, this.superficie);
+					ps.setInt(3, this.id);
 					ps.executeUpdate();  //devuelve 1 si todo ok
 					ps.close();
 				} catch (SQLException e) {
@@ -116,6 +109,9 @@ public class SedeDAO extends Sede{
 					if(rs.next()) {
 						this.id = rs.getInt("id");
 						this.nombre = rs.getString("nombre");
+						this.superficie = rs.getInt("superficie");
+						int id_sede = rs.getInt("id_sede");
+						this.sede = new SedeDAO(id_sede);
 					}
 				}
 				ps.close();
@@ -126,8 +122,8 @@ public class SedeDAO extends Sede{
 		}
 	}
 	
-	public static List<Sede> getAll(){
-		List<Sede> result = new ArrayList<Sede>();
+	public static List<Complejo> getAll(){
+		List<Complejo> result = new ArrayList<Complejo>();
 		Connection conn = MariaDBConnection.getConnection();
 		if(conn != null) {
 			PreparedStatement ps;
@@ -136,9 +132,10 @@ public class SedeDAO extends Sede{
 				if(ps.execute()) {
 					ResultSet rs = ps.getResultSet();
 					while(rs.next()) {
-						Sede s = new Sede(rs.getInt("id"),
-									rs.getString("nombre"));
-						result.add(s);
+						Complejo c = new Complejo(rs.getInt("id"),
+									rs.getString("nombre"),
+									rs.getInt("superficie"));
+						result.add(c);
 					}
 					rs.close();
 				}
@@ -149,5 +146,4 @@ public class SedeDAO extends Sede{
 		}
 		return result;
 	}
-	
 }
