@@ -61,8 +61,9 @@ public class Complejo {
 	}
 	@Override
 	public String toString() {
-		return "Complejo [id=" + id + ", nombre=" + nombre + ", superficie=" + superficie + ", sede=" + sede + "]";
+		return "Complejo [id=" + id + ", nombre=" + nombre + ", superficie=" + superficie + ", sede=" + sede.getId() + "]";
 	}
+	
 	
 	
 	

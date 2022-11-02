@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import basededatos.carlosserrano.com.model.Conection.MariaDBConnection;
+import basededatos.carlosserrano.com.model.Entity.Complejo;
 import basededatos.carlosserrano.com.model.Entity.Sede;
 
 //SedeDAOImplMariaDB
@@ -116,6 +117,7 @@ public class SedeDAO extends Sede{
 					if(rs.next()) {
 						this.id = rs.getInt("id");
 						this.nombre = rs.getString("nombre");
+						//this.complejos = ComplejoDAO.getComplejosOfSede(this);
 					}
 				}
 				ps.close();
@@ -149,5 +151,25 @@ public class SedeDAO extends Sede{
 		}
 		return result;
 	}
+	
+	@Override
+		public List<Complejo> getComplejos() {
+			if(super.getComplejos()==null) {
+				System.out.println("Consultando...");
+				setComplejos(ComplejoDAO.getComplejosOfSede(this));
+			}
+			return super.getComplejos();
+		}
+	@Override
+		public void addComplejo(Complejo c) {
+			c.setSede(this);
+			ComplejoDAO cdao = new ComplejoDAO(c);
+			if(c.getId()==-1) {
+				cdao.save();
+			}else {
+				cdao.update();
+			}
+			super.addComplejo(cdao);
+		}
 	
 }

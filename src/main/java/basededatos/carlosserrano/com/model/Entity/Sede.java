@@ -1,14 +1,21 @@
 package basededatos.carlosserrano.com.model.Entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Sede {
 	protected int id;
 	protected String nombre;
+	protected List<Complejo> complejos;
 	
 	public Sede(int id, String nombre) {
 		this.id=id; this.nombre=nombre;
 	}
 	public Sede() {
 		this(-1,"");
+	}
+	public Sede(int id) {
+		this.id=id;
 	}
 	public int getId() {
 		return id;
@@ -22,9 +29,21 @@ public class Sede {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+	public List<Complejo> getComplejos() {
+		return complejos;
+	}
+	public void setComplejos(List<Complejo> complejos) {
+		this.complejos = complejos;
+	}
+	public void addComplejo(Complejo c) {
+		if(this.complejos==null) this.complejos=new ArrayList<Complejo>();
+		this.complejos.add(c);
+	}
 	@Override
 	public String toString() {
-		return "Sede [id=" + id + ", nombre=" + nombre + "]";
+		String result = "Sede [id=" + id + ", nombre=" + nombre + "]";
+		result+=getComplejos();
+		return result;
 	}
 	@Override
 	public int hashCode() {
